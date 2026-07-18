@@ -36,3 +36,5 @@ build/
 # Misc
 *.tmp
 *.bak
+
+db.json

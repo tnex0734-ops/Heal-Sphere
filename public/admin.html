@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nexus Healer Admin Dashboard - View and manage patient triage assessments">
-  <title>Admin Dashboard — Nexus Healer</title>
+  <meta name="description" content="Heal Sphere Admin Dashboard - View and manage patient records and triage assessments">
+  <title>Admin Dashboard — Heal Sphere</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
         <div class="logo-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
-        <span class="logo-text">Nexus<span class="logo-accent">Healer</span></span>
+        <span class="logo-text">Heal<span class="logo-accent">Sphere</span></span>
       </a>
     </div>
     <nav class="sidebar-nav">
@@ -27,8 +27,12 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Dashboard
       </a>
+      <a href="/admin" class="sidebar-link" id="navPatients" onclick="showPatientsView(); return false;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Patients
+      </a>
       <a href="/admin" class="sidebar-link" id="navRecords" onclick="showRecordsView(); return false;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         All Records
       </a>
       <a href="/" class="sidebar-link">
@@ -52,7 +56,7 @@
     <button class="mobile-sidebar-btn" id="mobileSidebarBtn" aria-label="Toggle sidebar">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
-    <span class="logo-text">Nexus<span class="logo-accent">Healer</span></span>
+    <span class="logo-text">Heal<span class="logo-accent">Sphere</span></span>
   </header>
 
   <!-- Main Content -->
@@ -75,15 +79,60 @@
       </div>
     </div>
 
-    <!-- Stats Overview -->
+    <!-- Global Patient Search -->
+    <div class="patient-search-bar">
+      <div class="patient-search-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="patientSearchInput" class="patient-search-input" placeholder="Search patient by name, Patient ID, phone, disease, or symptoms...">
+        <button class="patient-search-clear" id="patientSearchClear" onclick="clearPatientSearch()" style="display:none;">×</button>
+      </div>
+      <div class="patient-search-filters">
+        <button class="filter-pill active" data-filter="all" onclick="setSearchFilter(this, 'all')">All</button>
+        <button class="filter-pill" data-filter="high" onclick="setSearchFilter(this, 'high')">High Risk</button>
+        <button class="filter-pill" data-filter="low" onclick="setSearchFilter(this, 'low')">Low Risk</button>
+        <button class="filter-pill" data-filter="followup" onclick="setSearchFilter(this, 'followup')">Follow-up</button>
+        <button class="filter-pill" data-filter="today" onclick="setSearchFilter(this, 'today')">Today</button>
+        <button class="filter-pill" data-filter="week" onclick="setSearchFilter(this, 'week')">Last 7 Days</button>
+      </div>
+      <div class="patient-search-results" id="patientSearchResults" style="display:none;"></div>
+    </div>
+
+    <!-- Stats Overview (8 cards) -->
     <div class="stats-overview" id="statsOverview">
       <div class="stat-card-admin">
-        <div class="stat-card-admin-icon stat-icon-total">
+        <div class="stat-card-admin-icon stat-icon-patients">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <div class="stat-card-admin-info">
-          <span class="stat-card-admin-value" id="statTotal">0</span>
-          <span class="stat-card-admin-label">Total Assessments</span>
+          <span class="stat-card-admin-value" id="statTotalPatients">0</span>
+          <span class="stat-card-admin-label">Total Patients</span>
+        </div>
+      </div>
+      <div class="stat-card-admin">
+        <div class="stat-card-admin-icon stat-icon-total">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="stat-card-admin-info">
+          <span class="stat-card-admin-value" id="statToday">0</span>
+          <span class="stat-card-admin-label">Today's Assessments</span>
+        </div>
+      </div>
+      <div class="stat-card-admin">
+        <div class="stat-card-admin-icon stat-icon-new">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        </div>
+        <div class="stat-card-admin-info">
+          <span class="stat-card-admin-value" id="statNewToday">0</span>
+          <span class="stat-card-admin-label">New Patients Today</span>
+        </div>
+      </div>
+      <div class="stat-card-admin">
+        <div class="stat-card-admin-icon stat-icon-followup">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </div>
+        <div class="stat-card-admin-info">
+          <span class="stat-card-admin-value" id="statFollowUp">0</span>
+          <span class="stat-card-admin-label">Follow-up Patients</span>
         </div>
       </div>
       <div class="stat-card-admin">
@@ -96,24 +145,6 @@
         </div>
       </div>
       <div class="stat-card-admin">
-        <div class="stat-card-admin-icon stat-icon-medium">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        </div>
-        <div class="stat-card-admin-info">
-          <span class="stat-card-admin-value" id="statMedium">0</span>
-          <span class="stat-card-admin-label">Medium Priority</span>
-        </div>
-      </div>
-      <div class="stat-card-admin">
-        <div class="stat-card-admin-icon stat-icon-low">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-        </div>
-        <div class="stat-card-admin-info">
-          <span class="stat-card-admin-value" id="statLow">0</span>
-          <span class="stat-card-admin-label">Low Priority</span>
-        </div>
-      </div>
-      <div class="stat-card-admin">
         <div class="stat-card-admin-icon stat-icon-risk">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
         </div>
@@ -123,12 +154,21 @@
         </div>
       </div>
       <div class="stat-card-admin">
-        <div class="stat-card-admin-icon stat-icon-today">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div class="stat-card-admin-icon stat-icon-reports">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </div>
         <div class="stat-card-admin-info">
-          <span class="stat-card-admin-value" id="statToday">0</span>
-          <span class="stat-card-admin-label">Today's Assessments</span>
+          <span class="stat-card-admin-value" id="statReportsToday">0</span>
+          <span class="stat-card-admin-label">Reports Today</span>
+        </div>
+      </div>
+      <div class="stat-card-admin">
+        <div class="stat-card-admin-icon stat-icon-total">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div class="stat-card-admin-info">
+          <span class="stat-card-admin-value" id="statTotal">0</span>
+          <span class="stat-card-admin-label">Total Assessments</span>
         </div>
       </div>
     </div>
@@ -173,8 +213,32 @@
       </div>
     </div>
 
+    <!-- Patients Table -->
+    <div class="records-section" id="patientsSection" style="display:none;">
+      <div class="records-header">
+        <h3 class="records-title">All Patients</h3>
+        <input type="text" id="patientTableSearch" class="filter-input" placeholder="Filter patients..." oninput="filterPatientTable()">
+      </div>
+      <div class="records-table-wrap" id="patientsTableWrap">
+        <table class="records-table">
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Name</th>
+              <th>Age / Gender</th>
+              <th>Phone</th>
+              <th>Last Visit</th>
+              <th>Risk</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="patientsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Filters & Records Table -->
-    <div class="records-section">
+    <div class="records-section" id="recordsSection">
       <div class="records-header">
         <h3 class="records-title">Assessment Records</h3>
         <div class="records-filters">
@@ -209,8 +273,8 @@
           <thead>
             <tr>
               <th>Date & Time</th>
+              <th>Patient</th>
               <th>Symptoms</th>
-              <th>Age / Gender</th>
               <th>Conditions</th>
               <th>Priority</th>
               <th>Risk</th>

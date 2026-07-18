@@ -1,5 +1,5 @@
 /* =============================================
-   Nexus Healer — Design System & Styles
+   Heal Sphere — Design System & Styles
    =============================================
    Fonts: Figtree (headings) + Noto Sans (body)
    Colors: Olive green primary, Peach accents, 
@@ -308,6 +308,97 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 16px rgba(74, 93, 62, 0.35);
 }
 
+/* --- Language Selector --- */
+.lang-selector {
+  position: relative;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--primary-bg);
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.lang-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.lang-btn svg {
+  flex-shrink: 0;
+}
+
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: var(--z-dropdown);
+  animation: langDropIn 200ms ease-out;
+}
+
+.lang-dropdown.open {
+  display: block;
+}
+
+@keyframes langDropIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.lang-option:hover {
+  background: var(--primary-bg);
+  color: var(--primary-dark);
+}
+
+.lang-option.active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.lang-flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
@@ -593,24 +684,27 @@ h1, h2, h3, h4, h5, h6 {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 160px;
-  height: 160px;
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.visual-center {
-  width: 80px;
-  height: 80px;
+#particle-sphere-container {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  z-index: 2;
+  border-radius: 50%;
+  cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  border-radius: 50%;
-  color: white;
-  z-index: 1;
-  position: relative;
+}
+
+#particle-sphere-container:active {
+  cursor: grabbing;
 }
 
 .pulse-ring {
@@ -625,6 +719,60 @@ h1, h2, h3, h4, h5, h6 {
 
 .pulse-ring-2 {
   animation-delay: 1.5s;
+}
+
+/* --- Orbiting Health Elements --- */
+.orbiting-element {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  z-index: 3;
+}
+
+.orbit-pill {
+  animation: orbitPill 10s infinite linear, floatPill 4s infinite ease-in-out;
+}
+
+.orbit-shield {
+  animation: orbitShield 12s infinite linear, floatShield 5s infinite ease-in-out;
+}
+
+.orbit-cross {
+  animation: orbitCross 8s infinite linear, floatCross 3.5s infinite ease-in-out;
+}
+
+/* Specific orbit and floating keyframes to make the icons orbit and hover */
+@keyframes orbitPill {
+  0% { transform: rotate(0deg) translate(125px) rotate(0deg); }
+  100% { transform: rotate(360deg) translate(125px) rotate(-360deg); }
+}
+@keyframes orbitShield {
+  0% { transform: rotate(120deg) translate(135px) rotate(-120deg); }
+  100% { transform: rotate(480deg) translate(135px) rotate(-480deg); }
+}
+@keyframes orbitCross {
+  0% { transform: rotate(240deg) translate(115px) rotate(-240deg); }
+  100% { transform: rotate(600deg) translate(115px) rotate(-600deg); }
+}
+@keyframes floatPill {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -6px; }
+}
+@keyframes floatShield {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: 6px; }
+}
+@keyframes floatCross {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -4px; }
 }
 
 @keyframes pulseRing {
@@ -1043,6 +1191,380 @@ select.form-input {
   font-size: 12px;
   color: var(--text-muted);
   line-height: 1.5;
+}
+
+/* --- Patient Information Grid --- */
+.patient-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.form-group-wide {
+  grid-column: 1 / -1;
+}
+
+.form-input-readonly {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.required {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.form-hint {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* --- Medical History Chips --- */
+.medical-history-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-bg);
+}
+
+.chip.active {
+  background: var(--primary);
+  color: var(--text-inverse);
+  border-color: var(--primary);
+}
+
+/* --- Upload Zone --- */
+.upload-zone {
+  border: 2px dashed var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-slow);
+  background: var(--bg);
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--primary);
+  background: var(--primary-bg);
+}
+
+.upload-icon {
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.upload-zone:hover .upload-icon,
+.upload-zone.drag-over .upload-icon {
+  color: var(--primary);
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-1);
+}
+
+.upload-subtext {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.upload-browse-btn {
+  display: inline-flex;
+  padding: 10px 24px;
+  background: var(--primary);
+  color: var(--text-inverse);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition);
+  border: none;
+}
+
+.upload-browse-btn:hover {
+  background: var(--primary-dark);
+}
+
+.upload-formats {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: var(--space-3);
+}
+
+/* --- Uploaded Files List --- */
+.uploaded-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.upload-file-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition);
+}
+
+.upload-file-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-bg);
+  color: var(--primary);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.upload-file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.upload-file-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upload-file-status {
+  font-size: 12px;
+  color: var(--success);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.upload-file-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.analyze-btn {
+  padding: 6px 14px;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.analyze-btn:hover {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+.analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.analyze-btn.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.remove-file-btn {
+  padding: 6px 8px;
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+}
+
+.remove-file-btn:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+/* --- Report Analysis Results --- */
+.report-analysis-results {
+  margin-top: var(--space-4);
+}
+
+.report-analysis-card {
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.report-analysis-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.analysis-findings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.analysis-finding-item {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.analysis-finding-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.analysis-finding-value {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: var(--text);
+}
+
+.analysis-finding-status {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.analysis-finding-status.status-low {
+  color: var(--warning);
+}
+
+.analysis-finding-status.status-high {
+  color: var(--danger);
+}
+
+.analysis-finding-status.status-normal {
+  color: var(--success);
+}
+
+/* --- Symptom Suggestions --- */
+.symptom-suggestions {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow-hover);
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: var(--space-2);
+  z-index: var(--z-dropdown);
+}
+
+.symptom-suggestion-item {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.symptom-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.symptom-suggestion-item:hover {
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+
+/* --- Symptom Tags --- */
+.symptom-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.symptom-tag-selected {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 5px 12px;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--primary);
+}
+
+.symptom-tag-remove {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.symptom-tag-remove:hover {
+  opacity: 1;
 }
 
 /* --- Results Panel --- */
@@ -1839,4 +2361,128 @@ select.form-input {
     opacity: 1;
     transform: none;
   }
+}
+
+/* --- Toast Notifications --- */
+.hs-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 12px 24px;
+  background: var(--text);
+  color: var(--text-inverse);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  z-index: 1100;
+  opacity: 0;
+  transition: all 0.3s ease;
+  max-width: 400px;
+  text-align: center;
+}
+
+.hs-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.hs-toast.hs-toast-success { background: var(--success); }
+.hs-toast.hs-toast-error { background: var(--danger); }
+
+/* Unset sticky on triage input panel since form is now very tall */
+.triage-input-panel {
+  position: static !important;
+  top: auto !important;
+}
+
+/* Responsive Patient Info Grid */
+@media (max-width: 640px) {
+  .patient-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-group-wide {
+    grid-column: 1;
+  }
+  .analysis-findings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* --- Auto-Fill Highlight Animation --- */
+@keyframes autoFillGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(90, 143, 90, 0.5);
+    border-color: var(--success);
+    background-color: rgba(90, 143, 90, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 12px 2px rgba(90, 143, 90, 0.25);
+    border-color: var(--success);
+    background-color: rgba(90, 143, 90, 0.08);
+  }
+  100% {
+    box-shadow: none;
+    border-color: var(--input-border);
+    background-color: var(--input-bg);
+  }
+}
+
+.auto-filled {
+  animation: autoFillGlow 3s ease-out forwards !important;
+  border-color: var(--success) !important;
+}
+
+/* --- Analyzing Spinner (inline) --- */
+@keyframes analyzeSpinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.analyzing-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--primary-bg);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: analyzeSpinner 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+/* Upload file status variants */
+.upload-status-analyzing {
+  color: var(--primary) !important;
+  font-weight: 600;
+}
+
+.upload-status-done {
+  color: var(--success) !important;
+  font-weight: 600;
+}
+
+/* Required asterisk */
+.required {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* Form hint */
+.form-hint {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+/* Section title with hint */
+.form-section-title .form-hint {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.form-section-title .required {
+  font-size: 14px;
 }

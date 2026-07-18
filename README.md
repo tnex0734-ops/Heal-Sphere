@@ -1,10 +1,10 @@
-# 🏥 Nexus Healer — AI-Powered Healthcare Triage Platform
+# 🏥 Heal Sphere — AI-Powered Healthcare Triage Platform
 
-**Nexus Healer** is an intelligent healthcare triage system that leverages **Google Gemini AI** to analyze patient symptoms in real-time and deliver instant, prioritized medical assessments. Built for speed and accuracy, it combines cutting-edge AI with a robust rule-based fallback engine — ensuring it works reliably even without an API key.
+**Heal Sphere** is an intelligent healthcare triage system that leverages **Google Gemini AI** to analyze patient symptoms in real-time and deliver instant, prioritized medical assessments. Built for speed and accuracy, it combines cutting-edge AI with a robust rule-based fallback engine — ensuring it works reliably even without an API key.
 
 ## ✨ What It Does
 
-Patients enter their symptoms and vital signs, and Nexus Healer instantly:
+Patients enter their symptoms and vital signs, and Heal Sphere instantly:
 - 🔍 **Identifies potential conditions** with confidence scores
 - 🚨 **Assigns a triage priority** (HIGH / MEDIUM / LOW) based on severity
 - 📊 **Calculates a risk score** (0–100) factoring in vitals and demographics
@@ -45,8 +45,8 @@ The system gracefully degrades — if the Gemini API key is unavailable or the A
 
 ```bash
 # Clone the repository
-git clone https://github.com/tnex0734-ops/nexus-healer.git
-cd nexus-healer
+git clone https://github.com/tnex0734-ops/Heal-Sphere.git
+cd Heal-Sphere
 
 # Install dependencies
 npm install
@@ -70,13 +70,16 @@ The app runs at `http://localhost:3000` — the admin dashboard is at `http://lo
 
 ## 📋 Features
 
-- **AI-Powered Symptom Triage** — Intelligent analysis using Google Gemini
-- **Rule-Based Fallback** — 50+ symptom patterns work offline without any API key
-- **Vital Signs Assessment** — Analyzes blood pressure, temperature, heart rate, SpO₂
-- **Risk Scoring** — Dynamic 0–100 risk calculation with age/vitals adjustments
-- **Admin Dashboard** — Real-time monitoring of all patient assessments
-- **Cloud Persistence** — All triage data stored in Google Cloud Firestore
-- **Responsive Design** — Premium glassmorphism UI with Inter typography
+- 🤖 **AI-Powered Symptom Triage** — Intelligent analysis using Google Gemini 2.0
+- 🌍 **Multi-Language Support (7 Languages)** — Fully localized UI and AI translations (EN, ES, FR, DE, HI, ZH, AR)
+- 🎙️ **Voice-to-Text Input** — Speak symptoms naturally in your native language using the Web Speech API
+- 📄 **Automated Report Parsing** — Upload medical reports and have AI automatically extract and fill patient details
+- ⚡ **Rule-Based Fallback** — 50+ symptom patterns work seamlessly offline without any API key
+- ❤️ **Vital Signs Assessment** — Analyzes blood pressure, temperature, heart rate, SpO₂
+- 📈 **Risk Scoring** — Dynamic 0–100 risk calculation with age/vitals adjustments
+- 📊 **Unified Admin Dashboard** — Real-time monitoring with dynamic pill-based filtering (High Risk, Today, Follow-up, etc.)
+- ☁️ **Cloud Persistence** — All triage data stored in Google Cloud Firestore
+- ✨ **Responsive Design** — Premium glassmorphism UI with smooth animations
 
 ## 🔒 Security
 
@@ -90,4 +93,4 @@ MIT
 
 ---
 
-> ⚠️ **Disclaimer**: Nexus Healer is a demonstration/educational project. Always consult qualified healthcare professionals for medical advice. This tool is not a substitute for professional medical diagnosis.
+> ⚠️ **Disclaimer**: Heal Sphere is a demonstration/educational project. Always consult qualified healthcare professionals for medical advice. This tool is not a substitute for professional medical diagnosis.

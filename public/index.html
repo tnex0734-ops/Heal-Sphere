@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nexus Healer - AI-Powered Healthcare Triage Platform. Quickly assess patient symptoms, predict conditions, and assign priority levels.">
-  <title>Nexus Healer — AI-Powered Healthcare Triage</title>
+  <meta name="description" content="Heal Sphere - AI-Powered Healthcare Triage Platform. Quickly assess patient symptoms, predict conditions, and assign priority levels.">
+  <title>Heal Sphere — AI-Powered Healthcare Triage</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -20,15 +20,31 @@
             <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
           </svg>
         </div>
-        <span class="logo-text">Nexus<span class="logo-accent">Healer</span></span>
+        <span class="logo-text">Heal<span class="logo-accent">Sphere</span></span>
       </a>
       <ul class="nav-links">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#triage">Triage Tool</a></li>
-        <li><a href="#about">About</a></li>
+        <li><a href="#home" data-i18n="nav-home">Home</a></li>
+        <li><a href="#features" data-i18n="nav-features">Features</a></li>
+        <li><a href="#triage" data-i18n="nav-triage">Triage Tool</a></li>
+        <li><a href="#about" data-i18n="nav-about">About</a></li>
       </ul>
-      <a href="#triage" class="nav-cta">Start Assessment</a>
+      <div class="lang-selector" id="langSelector">
+        <button class="lang-btn" id="langBtn" aria-label="Change language">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span id="langLabel">EN</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+          <button class="lang-option active" data-lang="en"><span class="lang-flag">🇺🇸</span> English</button>
+          <button class="lang-option" data-lang="es"><span class="lang-flag">🇪🇸</span> Español</button>
+          <button class="lang-option" data-lang="fr"><span class="lang-flag">🇫🇷</span> Français</button>
+          <button class="lang-option" data-lang="de"><span class="lang-flag">🇩🇪</span> Deutsch</button>
+          <button class="lang-option" data-lang="hi"><span class="lang-flag">🇮🇳</span> हिन्दी</button>
+          <button class="lang-option" data-lang="zh"><span class="lang-flag">🇨🇳</span> 中文</button>
+          <button class="lang-option" data-lang="ar"><span class="lang-flag">🇸🇦</span> العربية</button>
+        </div>
+      </div>
+      <a href="#triage" class="nav-cta" data-i18n="nav-cta">Start Assessment</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
@@ -45,15 +61,15 @@
     </div>
     <div class="hero-container">
       <div class="hero-content">
-        <div class="hero-badge">
+        <div class="hero-badge" data-i18n="hero-badge">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           AI-Powered Triage System
         </div>
-        <h1 class="hero-title">
+        <h1 class="hero-title" data-i18n-html="hero-title">
           Smarter Triage,<br>
           <span class="gradient-text">Faster Care</span>
         </h1>
-        <p class="hero-description">
+        <p class="hero-description" data-i18n="hero-desc">
           Reduce hospital wait times with AI-driven symptom analysis. 
           Our platform assists medical staff in quickly identifying high-risk patients 
           and prioritizing emergency care.
@@ -61,10 +77,10 @@
         <div class="hero-actions">
           <a href="#triage" class="btn btn-primary btn-lg">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            Start Assessment
+            <span data-i18n="hero-cta-start">Start Assessment</span>
           </a>
           <a href="#features" class="btn btn-ghost btn-lg">
-            Learn More
+            <span data-i18n="hero-cta-learn">Learn More</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
           </a>
         </div>
@@ -117,9 +133,22 @@
           <div class="hero-main-visual">
             <div class="pulse-ring"></div>
             <div class="pulse-ring pulse-ring-2"></div>
-            <div class="visual-center">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            <div id="particle-sphere-container"></div>
+            <!-- Orbiting Health Elements -->
+            <div class="orbiting-element orbit-pill" title="Pill">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>
+                <path d="m8.5 8.5 7 7"/>
+              </svg>
+            </div>
+            <div class="orbiting-element orbit-shield" title="Protection">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="orbiting-element orbit-cross" title="Medical Cross">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
               </svg>
             </div>
           </div>
@@ -132,9 +161,9 @@
   <section class="features" id="features">
     <div class="container">
       <div class="section-header">
-        <span class="section-badge">Core Features</span>
-        <h2 class="section-title">Everything You Need for<br><span class="gradient-text">Efficient Triage</span></h2>
-        <p class="section-subtitle">Our AI-powered platform streamlines the triage process with intelligent symptom analysis, accurate disease prediction, and instant priority classification.</p>
+        <span class="section-badge" data-i18n="section-badge-features">Core Features</span>
+        <h2 class="section-title" data-i18n-html="section-title-features">Everything You Need for<br><span class="gradient-text">Efficient Triage</span></h2>
+        <p class="section-subtitle" data-i18n="section-desc-features">Our AI-powered platform streamlines the triage process with intelligent symptom analysis, accurate disease prediction, and instant priority classification.</p>
       </div>
       <div class="features-grid">
         <div class="feature-card" data-animate>
@@ -246,19 +275,112 @@
   <section class="triage-section" id="triage">
     <div class="container">
       <div class="section-header">
-        <span class="section-badge">AI Triage Tool</span>
-        <h2 class="section-title">Start Your<br><span class="gradient-text">Assessment Now</span></h2>
-        <p class="section-subtitle">Enter patient symptoms and health parameters for an AI-powered triage assessment.</p>
+        <span class="section-badge" data-i18n="triage-badge">AI Triage Tool</span>
+        <h2 class="section-title" data-i18n-html="triage-title">Start Your<br><span class="gradient-text">Assessment Now</span></h2>
+        <p class="section-subtitle" data-i18n="triage-desc">Enter patient symptoms and health parameters for an AI-powered triage assessment.</p>
       </div>
       <div class="triage-layout">
         <!-- Input Panel -->
         <div class="triage-input-panel">
           <form id="triageForm" class="triage-form">
-            <!-- Symptom Input -->
+            <!-- Patient Information -->
+            <div class="form-section">
+              <h3 class="form-section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span data-i18n="form-patient-info">Patient Information</span>
+              </h3>
+              <div class="patient-info-grid">
+                <div class="form-group form-group-wide">
+                  <label for="patientNameInput" class="form-label" data-i18n-html="label-patient-name">Patient Name <span class="required">*</span></label>
+                  <input type="text" id="patientNameInput" class="form-input" data-i18n-placeholder="placeholder-patient-name" placeholder="Enter patient's full name" required>
+                </div>
+                <div class="form-group">
+                  <label for="patientIdDisplay" class="form-label">Patient ID <span class="form-hint">(Auto Generated)</span></label>
+                  <input type="text" id="patientIdDisplay" class="form-input form-input-readonly" placeholder="HS-000128" readonly>
+                </div>
+                <div class="form-group">
+                  <label for="phoneInput" class="form-label">Phone Number <span class="form-hint">(optional)</span></label>
+                  <input type="tel" id="phoneInput" class="form-input" placeholder="+91 9876543210">
+                </div>
+                <div class="form-group">
+                  <label for="dobInput" class="form-label">Date of Birth <span class="form-hint">(optional)</span></label>
+                  <input type="date" id="dobInput" class="form-input" max="">
+                </div>
+                <div class="form-group">
+                  <label for="ageInput" class="form-label">Age <span class="form-hint">(auto-calculated)</span></label>
+                  <input type="number" id="ageInput" class="form-input form-input-readonly" placeholder="Auto from DOB" min="0" max="120" readonly>
+                </div>
+                <div class="form-group">
+                  <label for="genderInput" class="form-label">Gender <span class="form-hint">(optional)</span></label>
+                  <select id="genderInput" class="form-input">
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="visitTypeInput" class="form-label">Visit Type <span class="form-hint">(optional)</span></label>
+                  <select id="visitTypeInput" class="form-input">
+                    <option value="First Visit">First Visit</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Emergency">Emergency</option>
+                    <option value="Routine Checkup">Routine Checkup</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Medical History -->
+            <div class="form-section">
+              <h3 class="form-section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Medical History <span class="form-hint">(optional)</span>
+              </h3>
+              <textarea id="medicalHistoryInput" class="form-textarea" placeholder="Example:&#10;&#10;• Heart attack (2022)&#10;• Asthma since childhood&#10;• Diabetes Type 2&#10;• Hypertension&#10;• Kidney Stones&#10;• Previous surgeries&#10;• Allergies&#10;• Current medications" rows="5"></textarea>
+              <div class="medical-history-chips">
+                <button type="button" class="chip" data-condition="Diabetes">+ Diabetes</button>
+                <button type="button" class="chip" data-condition="Hypertension">+ Hypertension</button>
+                <button type="button" class="chip" data-condition="Asthma">+ Asthma</button>
+                <button type="button" class="chip" data-condition="Heart Disease">+ Heart Disease</button>
+                <button type="button" class="chip" data-condition="Stroke">+ Stroke</button>
+                <button type="button" class="chip" data-condition="Kidney Disease">+ Kidney Disease</button>
+                <button type="button" class="chip" data-condition="Cancer">+ Cancer</button>
+                <button type="button" class="chip" data-condition="Pregnancy">+ Pregnancy</button>
+                <button type="button" class="chip" data-condition="COPD">+ COPD</button>
+                <button type="button" class="chip" data-condition="Thyroid">+ Thyroid</button>
+                <button type="button" class="chip" data-condition="Allergy">+ Allergy</button>
+                <button type="button" class="chip" data-condition="Surgery History">+ Surgery History</button>
+              </div>
+            </div>
+
+            <!-- Medical Reports Upload -->
+            <div class="form-section">
+              <h3 class="form-section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Medical Reports <span class="form-hint">(optional — auto-fills form)</span>
+              </h3>
+              <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <p class="upload-text">Drag & Drop Reports Here</p>
+                <p class="upload-subtext">or</p>
+                <label class="upload-browse-btn">
+                  Browse Files
+                  <input type="file" id="reportFileInput" multiple accept=".pdf,.jpg,.jpeg,.png" hidden>
+                </label>
+                <p class="upload-formats">PDF, JPG, PNG, JPEG — Max 20MB</p>
+              </div>
+              <div class="uploaded-files-list" id="uploadedFilesList"></div>
+              <div class="report-analysis-results" id="reportAnalysisResults"></div>
+            </div>
+
+            <!-- Symptom Input (Enhanced) -->
             <div class="form-section">
               <h3 class="form-section-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-                Symptom Description
+                <span data-i18n-html="form-symptoms">Symptom Description <span class="required">*</span></span>
               </h3>
               <div class="symptom-input-wrap">
                 <textarea id="symptomInput" class="form-textarea" placeholder="Describe the patient's symptoms in detail... &#10;&#10;Example: severe headache for 3 days, nausea, blurred vision, sensitivity to light" rows="4" required></textarea>
@@ -268,9 +390,11 @@
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
                     <line x1="12" x2="12" y1="19" y2="22"/>
                   </svg>
-                  <span class="voice-label">Voice</span>
+                  <span class="voice-label" data-i18n="voice-label">Voice</span>
                 </button>
               </div>
+              <div class="symptom-suggestions" id="symptomSuggestions" style="display:none;"></div>
+              <div class="symptom-tags-container" id="symptomTagsContainer"></div>
               <div class="voice-status" id="voiceStatus" style="display:none;">
                 <div class="voice-indicator"></div>
                 <span>Listening... Speak now</span>
@@ -281,36 +405,23 @@
             <div class="form-section">
               <h3 class="form-section-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                Health Parameters
+                <span data-i18n-html="form-health-params">Health Parameters <span class="form-hint">(optional)</span></span>
               </h3>
               <div class="params-grid">
                 <div class="form-group">
-                  <label for="ageInput" class="form-label">Age</label>
-                  <input type="number" id="ageInput" class="form-input" placeholder="e.g. 45" min="0" max="120">
-                </div>
-                <div class="form-group">
-                  <label for="genderInput" class="form-label">Gender</label>
-                  <select id="genderInput" class="form-input">
-                    <option value="">Select</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="bpInput" class="form-label">Blood Pressure</label>
+                  <label for="bpInput" class="form-label">Blood Pressure <span class="form-hint">(optional)</span></label>
                   <input type="text" id="bpInput" class="form-input" placeholder="e.g. 120/80">
                 </div>
                 <div class="form-group">
-                  <label for="tempInput" class="form-label">Temperature (°F)</label>
+                  <label for="tempInput" class="form-label">Temperature (°F) <span class="form-hint">(optional)</span></label>
                   <input type="number" id="tempInput" class="form-input" placeholder="e.g. 98.6" step="0.1">
                 </div>
                 <div class="form-group">
-                  <label for="hrInput" class="form-label">Heart Rate (bpm)</label>
+                  <label for="hrInput" class="form-label">Heart Rate (bpm) <span class="form-hint">(optional)</span></label>
                   <input type="number" id="hrInput" class="form-input" placeholder="e.g. 72" min="0" max="300">
                 </div>
                 <div class="form-group">
-                  <label for="o2Input" class="form-label">O₂ Saturation (%)</label>
+                  <label for="o2Input" class="form-label">O₂ Saturation (%) <span class="form-hint">(optional)</span></label>
                   <input type="number" id="o2Input" class="form-input" placeholder="e.g. 98" min="0" max="100">
                 </div>
               </div>
@@ -318,7 +429,7 @@
 
             <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              <span>Analyze & Triage</span>
+              <span data-i18n="btn-analyze">Analyze & Triage</span>
             </button>
             <p class="form-disclaimer">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -494,7 +605,7 @@
             <div class="logo-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             </div>
-            <span class="logo-text">Nexus<span class="logo-accent">Healer</span></span>
+            <span class="logo-text">Heal<span class="logo-accent">Sphere</span></span>
           </a>
           <p>AI-Powered Healthcare Triage Platform. Helping hospitals reduce wait times and prioritize critical patients.</p>
         </div>
@@ -514,20 +625,23 @@
         </div>
         <div class="footer-links">
           <h4>Contact</h4>
-          <a href="#">support@nexushealer.ai</a>
+          <a href="#">support@healsphere.ai</a>
           <a href="#">Emergency: 911</a>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 Nexus Healer. Built for Healthcare Hackathon. For demonstration purposes only.</p>
+        <p>&copy; 2026 Heal Sphere. Built for Healthcare Hackathon. For demonstration purposes only.</p>
       </div>
     </div>
   </footer>
 
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
+  <script src="translations.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

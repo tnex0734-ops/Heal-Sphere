@@ -7,7 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '30mb' }));
+app.use(express.urlencoded({ limit: '30mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Try to initialize Gemini AI (optional — falls back to rule-based if no key)
@@ -292,10 +293,174 @@ function ruleBasedTriage(symptoms, age, gender, bp, temp, hr, o2) {
   };
 }
 
+// ============================================================
+// REPORT ANALYSIS API
+// ============================================================
+app.post('/api/reports/analyze', async (req, res) => {
+  try {
+    const { fileName, fileType, fileDataUrl } = req.body;
+
+    if (useAI && genAI) {
+      try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        let parts = [];
+
+        if (fileDataUrl) {
+          const mimeType = fileType || 'application/pdf';
+          const base64Data = fileDataUrl.replace(/^data:[^;]+;base64,/, '');
+          parts = [
+            {
+              inlineData: {
+                mimeType: mimeType,
+                data: base64Data
+              }
+            },
+            { text: `Analyze this medical report file (${fileName}).
+
+You must do TWO things:
+1. Extract all medical findings, lab values, abnormal indicators, and provide recommendations.
+2. Extract any patient details you can find in the report (patient name, age, gender, date of birth, blood pressure, temperature, heart rate, oxygen saturation, symptoms described, and medical history or diagnoses).
+
+Respond ONLY with valid JSON in this exact format (every field must be present, use null for fields you cannot find):
+{
+  "summary": "Brief summary of what this report contains",
+  "findings": [
+    { "name": "Hemoglobin", "value": "11.2 g/dL", "status": "Low" },
+    { "name": "Blood Sugar", "value": "245 mg/dL", "status": "High" }
+  ],
+  "risks": ["Risk indicator 1", "Risk indicator 2"],
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "extractedPatient": {
+    "name": "Patient name or null",
+    "age": "Age as number or null",
+    "gender": "Male/Female/Other or null",
+    "dob": "Date of birth in YYYY-MM-DD format or null",
+    "bloodPressure": "Systolic/Diastolic like 120/80 or null",
+    "temperature": "Temperature in Fahrenheit as number or null",
+    "heartRate": "Heart rate as number or null",
+    "oxygenLevel": "SpO2 as number or null",
+    "symptoms": "Comma-separated symptoms found in the report or null",
+    "medicalHistory": "Any diagnoses, conditions, or medical history mentioned or null"
+  }
+}
+
+Rules:
+- For findings, include ALL lab values, test results, and measurements found in the report.
+- Mark status as "Normal", "Low", "High", "Critical", or "Borderline".
+- For extractedPatient, look for patient demographic info (name, age, sex, DOB) typically at the top of medical reports.
+- For vitals, convert units if needed (e.g., Celsius to Fahrenheit for temperature).
+- If a field is not present in the report, set it to null — do NOT guess.
+- Return ONLY the JSON object, no markdown fences, no extra text.` }
+          ];
+
+          const result = await model.generateContent({ contents: [{ role: 'user', parts }] });
+          const response = await result.response;
+          let text = response.text().replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          const parsed = JSON.parse(text);
+          // Ensure extractedPatient always exists
+          if (!parsed.extractedPatient) {
+            parsed.extractedPatient = {};
+          }
+          return res.json(parsed);
+        }
+      } catch (aiError) {
+        console.log('Report analysis AI error:', aiError.message);
+      }
+    }
+
+    // Rule-based fallback (with rich mock details for demo/testing auto-fill)
+    const nameLower = (fileName || '').toLowerCase();
+    let analysis = {
+      summary: `Medical report "${fileName}" uploaded successfully. AI analysis not available — please review manually.`,
+      findings: [],
+      risks: [],
+      recommendations: ['Have a doctor review this report', 'Note any abnormal values manually'],
+      extractedPatient: {
+        name: "Jane Doe",
+        age: 32,
+        gender: "Female",
+        dob: "1994-08-12",
+        bloodPressure: "118/75",
+        temperature: 98.4,
+        heartRate: 76,
+        oxygenLevel: 99,
+        symptoms: "Mild headache, fatigue",
+        medicalHistory: "Asthma since childhood"
+      }
+    };
+
+    if (nameLower.includes('cbc') || nameLower.includes('blood')) {
+      analysis.summary = `Blood test report "${fileName}" received. Typical findings shown below (sample data).`;
+      analysis.findings = [
+        { name: 'Hemoglobin', value: '13.5 g/dL', status: 'Normal' },
+        { name: 'WBC', value: '6,500 /uL', status: 'Normal' },
+        { name: 'Platelets', value: '250,000 /uL', status: 'Normal' }
+      ];
+      analysis.extractedPatient = {
+        name: "John Doe",
+        age: 36,
+        gender: "Male",
+        dob: "1990-06-15",
+        bloodPressure: "128/82",
+        temperature: 98.6,
+        heartRate: 72,
+        oxygenLevel: 98,
+        symptoms: "Fever, fatigue, dry cough",
+        medicalHistory: "None"
+      };
+    } else if (nameLower.includes('ecg') || nameLower.includes('ekg')) {
+      analysis.summary = 'ECG report received. Please have a cardiologist review the waveform data.';
+      analysis.risks = ['Rhythm analysis requires specialist review'];
+      analysis.extractedPatient = {
+        name: "Robert Johnson",
+        age: 58,
+        gender: "Male",
+        dob: "1968-03-22",
+        bloodPressure: "142/90",
+        temperature: 98.2,
+        heartRate: 85,
+        oxygenLevel: 96,
+        symptoms: "Chest tightness on exertion, mild shortness of breath",
+        medicalHistory: "Hypertension, Hyperlipidemia"
+      };
+    } else if (nameLower.includes('xray') || nameLower.includes('x-ray') || nameLower.includes('mri') || nameLower.includes('ct')) {
+      analysis.summary = 'Imaging report received. AI image analysis requires Gemini API key.';
+      analysis.recommendations = ['Have a radiologist review the imaging', 'Correlate with clinical symptoms'];
+      analysis.extractedPatient = {
+        name: "Alice Williams",
+        age: 28,
+        gender: "Female",
+        dob: "1998-11-05",
+        bloodPressure: "115/70",
+        temperature: 99.1,
+        heartRate: 80,
+        oxygenLevel: 97,
+        symptoms: "Persistent cough, chest pain when deep breathing",
+        medicalHistory: "Pneumonia (2020)"
+      };
+    }
+
+    res.json(analysis);
+  } catch (error) {
+    console.error('Report analysis error:', error);
+    res.status(500).json({
+      summary: 'Analysis failed. Please try again.',
+      findings: [],
+      risks: [],
+      recommendations: ['Manual review required'],
+      extractedPatient: {}
+    });
+  }
+});
+
+// ============================================================
+// TRIAGE API
+// ============================================================
 // Triage API endpoint
 app.post('/api/triage', async (req, res) => {
   try {
     const { symptoms, age, gender, bloodPressure, temperature, heartRate, oxygenLevel } = req.body;
+    const body = req.body;
 
     if (!symptoms) {
       return res.status(400).json({ error: 'Symptoms are required' });
@@ -305,11 +470,17 @@ app.post('/api/triage', async (req, res) => {
     if (useAI && genAI) {
       try {
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        const prompt = `You are an expert medical triage AI assistant. Based on the following patient information, provide a triage assessment. 
+        const langNames = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', hi: 'Hindi', zh: 'Chinese', ar: 'Arabic' };
+        const requestedLang = langNames[body.lang] || 'English';
+
+        const prompt = `You are an expert medical triage AI assistant. Based on the following patient information, provide a comprehensive triage assessment.
+
+IMPORTANT: Respond in the language requested: "${requestedLang}" (all text values, condition names, descriptions, priorityReason, recommendations, immediateActions, and vitalSignsAssessment must be written in "${requestedLang}").
 
 IMPORTANT: You must respond ONLY with valid JSON, no markdown, no code blocks, no extra text.
 
 Patient Information:
+- Name: ${body.patientName || 'Unknown'}
 - Symptoms: ${symptoms}
 - Age: ${age || 'Not provided'}
 - Gender: ${gender || 'Not provided'}
@@ -317,6 +488,9 @@ Patient Information:
 - Temperature: ${temperature || 'Not provided'}°F
 - Heart Rate: ${heartRate || 'Not provided'} bpm
 - Oxygen Level: ${oxygenLevel || 'Not provided'}%
+- Visit Type: ${body.visitType || 'Not provided'}
+${body.medicalHistory ? `- Medical History: ${body.medicalHistory}` : ''}
+${body.reportAnalysis ? `- Uploaded Report Findings: ${body.reportAnalysis}` : ''}
 
 Respond with this exact JSON structure:
 {
@@ -338,7 +512,8 @@ Rules:
 3. MEDIUM: Needs prompt attention (high fever, moderate pain, persistent symptoms)
 4. LOW: Minor conditions (mild headache, cold, minor injuries)
 5. Risk score 0-100 based on overall severity
-6. Always recommend seeing a real doctor`;
+6. Factor in the medical history and uploaded report findings for a more accurate diagnosis
+7. Always recommend seeing a real doctor`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
@@ -373,12 +548,413 @@ Rules:
   }
 });
 
+// ============================================================
+// LOCAL JSON DATABASE & CRUD ENDPOINTS (EHR BACKEND)
+// ============================================================
+const fs = require('fs');
+const DB_FILE = path.join(__dirname, 'db.json');
+
+// Initialize database file if it doesn't exist
+if (!fs.existsSync(DB_FILE)) {
+  const initialDb = {
+    patients: [],
+    assessments: [],
+    reports: [],
+    counters: { patients: 0 }
+  };
+  fs.writeFileSync(DB_FILE, JSON.stringify(initialDb, null, 2), 'utf8');
+}
+
+function readDb() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    }
+  } catch (e) {
+    console.error('❌ Failed to read db.json:', e.message);
+  }
+  return { patients: [], assessments: [], reports: [], counters: { patients: 0 } };
+}
+
+function writeDb(data) {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    return true;
+  } catch (e) {
+    console.error('❌ Failed to write db.json:', e.message);
+    return false;
+  }
+}
+
+// Generate HS-XXXXXX Patient ID
+function generateBackendPatientId(dbData) {
+  dbData.counters = dbData.counters || { patients: 0 };
+  dbData.counters.patients++;
+  return 'HS-' + String(dbData.counters.patients).padStart(6, '0');
+}
+
+// --- PATIENTS ---
+
+// GET /api/patients - Get all patients or filter by name
+app.get('/api/patients', (req, res) => {
+  const dbData = readDb();
+  let results = dbData.patients || [];
+  
+  if (req.query.name) {
+    const searchLower = req.query.name.toLowerCase();
+    results = results.filter(p => p.name && p.name.toLowerCase().includes(searchLower));
+  } else if (req.query.phone) {
+    const cleanPhone = req.query.phone.replace(/\D/g, '');
+    results = results.filter(p => p.phone && p.phone.replace(/\D/g, '').includes(cleanPhone));
+  }
+  
+  res.json(results);
+});
+
+// GET /api/patients/search - Global patient search
+app.get('/api/patients/search', (req, res) => {
+  const dbData = readDb();
+  const query = (req.query.q || '').toLowerCase().trim();
+  
+  if (!query) return res.json([]);
+  
+  const patients = dbData.patients || [];
+  const assessments = dbData.assessments || [];
+  
+  // Map assessments by patientId
+  const patientAssessments = {};
+  assessments.forEach(a => {
+    if (a.patientId) {
+      patientAssessments[a.patientId] = patientAssessments[a.patientId] || [];
+      patientAssessments[a.patientId].push(a);
+    }
+  });
+  
+  const results = [];
+  patients.forEach(p => {
+    let matched = false;
+    
+    if (p.name && p.name.toLowerCase().includes(query)) matched = true;
+    if (p.patientId && p.patientId.toLowerCase().includes(query)) matched = true;
+    if (p.phone && p.phone.replace(/\D/g, '').includes(query.replace(/\D/g, ''))) matched = true;
+    if (p.medicalHistory && p.medicalHistory.toLowerCase().includes(query)) matched = true;
+    
+    // Search assessments
+    if (!matched && patientAssessments[p.patientId]) {
+      for (const a of patientAssessments[p.patientId]) {
+        if (a.symptoms && a.symptoms.toLowerCase().includes(query)) { matched = true; break; }
+        if (a.conditions && a.conditions.some(c => c.name && c.name.toLowerCase().includes(query))) { matched = true; break; }
+      }
+    }
+    
+    if (matched) {
+      const pAssessments = patientAssessments[p.patientId] || [];
+      const latest = pAssessments.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))[0];
+      
+      results.push({
+        ...p,
+        assessmentCount: pAssessments.length,
+        latestPriority: latest ? latest.priority : null,
+        latestRiskScore: latest ? latest.riskScore : null
+      });
+    }
+  });
+  
+  res.json(results);
+});
+
+// GET /api/patients/:id - Get patient by ID
+app.get('/api/patients/:id', (req, res) => {
+  const dbData = readDb();
+  const patient = dbData.patients.find(p => p.patientId === req.params.id);
+  if (!patient) return res.status(404).json({ error: 'Patient not found' });
+  res.json(patient);
+});
+
+// POST /api/patients - Create or update patient
+app.post('/api/patients', (req, res) => {
+  const dbData = readDb();
+  const data = req.body;
+  
+  let existingIndex = -1;
+  if (data.patientId) {
+    existingIndex = dbData.patients.findIndex(p => p.patientId === data.patientId);
+  }
+  
+  const now = new Date().toISOString();
+  
+  if (existingIndex >= 0) {
+    // Update existing patient
+    const existing = dbData.patients[existingIndex];
+    dbData.patients[existingIndex] = {
+      ...existing,
+      name: data.name || existing.name,
+      phone: data.phone || existing.phone,
+      dob: data.dob || existing.dob,
+      age: data.age !== undefined ? data.age : existing.age,
+      gender: data.gender || existing.gender,
+      bloodGroup: data.bloodGroup || existing.bloodGroup || '',
+      medicalHistory: data.medicalHistory || existing.medicalHistory,
+      lastVisit: now,
+      updatedAt: now
+    };
+    writeDb(dbData);
+    console.log('✅ Patient updated on backend:', data.patientId);
+    return res.json({ id: data.patientId, patientId: data.patientId, isNew: false });
+  } else {
+    // Create new patient
+    const newPatientId = data.patientId || generateBackendPatientId(dbData);
+    const newPatient = {
+      id: 'doc_' + Math.random().toString(36).substring(2, 11),
+      patientId: newPatientId,
+      name: data.name || '',
+      phone: data.phone || '',
+      dob: data.dob || '',
+      age: data.age !== undefined ? data.age : null,
+      gender: data.gender || '',
+      bloodGroup: data.bloodGroup || '',
+      medicalHistory: data.medicalHistory || '',
+      createdAt: now,
+      lastVisit: now,
+      updatedAt: now
+    };
+    dbData.patients.push(newPatient);
+    writeDb(dbData);
+    console.log('✅ New patient created on backend:', newPatientId);
+    return res.json({ id: newPatient.id, patientId: newPatientId, isNew: true });
+  }
+});
+
+// GET /api/patients/:id/profile - Get patient aggregated profile
+app.get('/api/patients/:id/profile', (req, res) => {
+  const dbData = readDb();
+  const patientId = req.params.id;
+  
+  const patient = dbData.patients.find(p => p.patientId === patientId);
+  if (!patient) return res.status(404).json({ error: 'Patient not found' });
+  
+  const assessments = dbData.assessments
+    .filter(a => a.patientId === patientId)
+    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    
+  const reports = dbData.reports
+    .filter(r => r.patientId === patientId)
+    .sort((a, b) => (b.uploadedAt || '').localeCompare(a.uploadedAt || ''));
+    
+  const latestAssessment = assessments[0] || null;
+  
+  res.json({
+    ...patient,
+    assessments,
+    reports,
+    currentRisk: latestAssessment ? latestAssessment.riskScore : 0,
+    currentPriority: latestAssessment ? latestAssessment.priority : 'N/A',
+    totalVisits: assessments.length,
+    totalReports: reports.length
+  });
+});
+
+// --- ASSESSMENTS ---
+
+// GET /api/assessments - Get all assessments (optionally filtered by patientId or priority)
+app.get('/api/assessments', (req, res) => {
+  const dbData = readDb();
+  let results = dbData.assessments || [];
+  
+  if (req.query.patientId) {
+    results = results.filter(a => a.patientId === req.query.patientId);
+  }
+  if (req.query.priority) {
+    results = results.filter(a => a.priority === req.query.priority);
+  }
+  
+  // Sort descending by default
+  results.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  res.json(results);
+});
+
+// POST /api/assessments - Save assessment
+app.post('/api/assessments', (req, res) => {
+  const dbData = readDb();
+  const { inputData, resultData } = req.body;
+  
+  const now = new Date().toISOString();
+  const newAssessment = {
+    id: 'assess_' + Math.random().toString(36).substring(2, 11),
+    patientId: inputData.patientId || '',
+    patientName: inputData.patientName || '',
+    visitType: inputData.visitType || 'First Visit',
+    symptoms: inputData.symptoms || '',
+    age: inputData.age || null,
+    gender: inputData.gender || '',
+    bloodPressure: inputData.bloodPressure || '',
+    temperature: inputData.temperature || null,
+    heartRate: inputData.heartRate || null,
+    oxygenLevel: inputData.oxygenLevel || null,
+    medicalHistory: inputData.medicalHistory || '',
+    priority: resultData.priority || 'MEDIUM',
+    riskScore: resultData.riskScore || 0,
+    conditions: resultData.conditions || [],
+    recommendations: resultData.recommendations || [],
+    immediateActions: resultData.immediateActions || [],
+    extractedSymptoms: resultData.extractedSymptoms || [],
+    vitalSignsAssessment: resultData.vitalSignsAssessment || '',
+    priorityReason: resultData.priorityReason || '',
+    reportIds: inputData.reportIds || [],
+    createdAt: now,
+    status: 'completed'
+  };
+  
+  dbData.assessments.push(newAssessment);
+  writeDb(dbData);
+  console.log('✅ Assessment saved on backend:', newAssessment.id);
+  res.json({ id: newAssessment.id });
+});
+
+// DELETE /api/assessments/:id - Delete assessment
+app.delete('/api/assessments/:id', (req, res) => {
+  const dbData = readDb();
+  const id = req.params.id;
+  const initialCount = dbData.assessments.length;
+  
+  dbData.assessments = dbData.assessments.filter(a => a.id !== id);
+  writeDb(dbData);
+  
+  console.log(`🗑 Deleted assessment ${id}. Success: ${dbData.assessments.length < initialCount}`);
+  res.json({ success: dbData.assessments.length < initialCount });
+});
+
+// --- REPORTS ---
+
+// GET /api/reports - Get reports (optionally filtered by patientId)
+app.get('/api/reports', (req, res) => {
+  const dbData = readDb();
+  let results = dbData.reports || [];
+  
+  if (req.query.patientId) {
+    results = results.filter(r => r.patientId === req.query.patientId);
+  }
+  
+  results.sort((a, b) => (b.uploadedAt || '').localeCompare(a.uploadedAt || ''));
+  res.json(results);
+});
+
+// POST /api/reports - Save medical report
+app.post('/api/reports', (req, res) => {
+  const dbData = readDb();
+  const data = req.body;
+  
+  const newReport = {
+    id: 'report_' + Math.random().toString(36).substring(2, 11),
+    patientId: data.patientId || '',
+    assessmentId: data.assessmentId || '',
+    fileName: data.fileName || '',
+    fileType: data.fileType || '',
+    fileSize: data.fileSize || 0,
+    fileDataUrl: data.fileDataUrl || '', // base64 encoded
+    analysis: data.analysis || null,
+    uploadedAt: new Date().toISOString(),
+    status: data.analysis ? 'analyzed' : 'uploaded'
+  };
+  
+  dbData.reports.push(newReport);
+  writeDb(dbData);
+  console.log('✅ Report saved on backend:', newReport.id);
+  res.json({ id: newReport.id });
+});
+
+// DELETE /api/reports/:id - Delete report
+app.delete('/api/reports/:id', (req, res) => {
+  const dbData = readDb();
+  const id = req.params.id;
+  const initialCount = dbData.reports.length;
+  
+  dbData.reports = dbData.reports.filter(r => r.id !== id);
+  writeDb(dbData);
+  
+  console.log(`🗑 Deleted report ${id}. Success: ${dbData.reports.length < initialCount}`);
+  res.json({ success: dbData.reports.length < initialCount });
+});
+
+// --- STATS ---
+
+// GET /api/stats - Get dynamically computed stats
+app.get('/api/stats', (req, res) => {
+  const dbData = readDb();
+  
+  const assessments = dbData.assessments || [];
+  const patients = dbData.patients || [];
+  const reports = dbData.reports || [];
+  
+  const today = new Date().toISOString().split('T')[0];
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  
+  const stats = {
+    total: 0,
+    high: 0,
+    medium: 0,
+    low: 0,
+    avgRiskScore: 0,
+    todayCount: 0,
+    totalPatients: patients.length,
+    newPatientsToday: 0,
+    followUpCount: 0,
+    reportsToday: 0,
+    totalReports: reports.length,
+    weeklyAssessments: 0
+  };
+  
+  let totalRisk = 0;
+  
+  assessments.forEach(a => {
+    stats.total++;
+    totalRisk += a.riskScore || 0;
+    
+    if (a.priority === 'HIGH') stats.high++;
+    else if (a.priority === 'MEDIUM') stats.medium++;
+    else stats.low++;
+    
+    if (a.createdAt && a.createdAt.startsWith(today)) {
+      stats.todayCount++;
+    }
+    
+    if (a.createdAt && a.createdAt >= weekAgo) {
+      stats.weeklyAssessments++;
+    }
+    
+    if (a.visitType === 'Follow-up') {
+      stats.followUpCount++;
+    }
+  });
+  
+  patients.forEach(p => {
+    if (p.createdAt && p.createdAt.startsWith(today)) {
+      stats.newPatientsToday++;
+    }
+  });
+  
+  reports.forEach(r => {
+    if (r.uploadedAt && r.uploadedAt.startsWith(today)) {
+      stats.reportsToday++;
+    }
+  });
+  
+  stats.avgRiskScore = stats.total > 0 ? Math.round(totalRisk / stats.total) : 0;
+  res.json(stats);
+});
+
 // Admin Dashboard route
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Patient Profile route
+app.get('/patient', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'patient.html'));
+});
+
 app.listen(PORT, () => {
-  console.log(`🏥 Nexus Healer server running at http://localhost:${PORT}`);
+  console.log(`🏥 Heal Sphere server running at http://localhost:${PORT}`);
   console.log(`📊 Admin Dashboard at http://localhost:${PORT}/admin`);
 });
+
