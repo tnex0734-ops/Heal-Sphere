@@ -61,6 +61,12 @@ npm start
 
 The app runs at `http://localhost:3000` — the admin dashboard is at `http://localhost:3000/admin`.
 
+### 🧪 Testing the AI Report Parser
+A sample medical report is included in the repository to help you test the AI automated data extraction feature. 
+1. Navigate to the Triage Tool at `http://localhost:3000`
+2. In the "Upload Medical Reports" section, upload the included `test_Patient_Medical_Report_HealSphere.pdf` file.
+3. The AI will instantly read the PDF and automatically fill out the patient's name, age, gender, and vital signs!
+
 ### Environment Variables
 
 | Variable | Required | Description |
